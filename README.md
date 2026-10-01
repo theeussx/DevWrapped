@@ -333,7 +333,7 @@ npm run build       # compile to out/
 npm run watch       # compile on change
 npm run typecheck   # tsc --noEmit
 npm run lint        # eslint (type-aware, no `any`, no network imports)
-npm test            # build + node --test "out/test/*.test.js"
+npm test            # build + run the test suite
 npm run package     # production build + VSIX in dist/
 ```
 
