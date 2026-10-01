@@ -7,7 +7,6 @@
  */
 
 import type { ProjectsPagePayload, TrendPoint, TrendView } from '../types/analytics';
-import { formatDuration, formatPercent, formatTimestamp } from '../utils/format';
 import type { StatsSource } from './Aggregator';
 import { projectMeta, rangeTotals } from './Aggregator';
 import { buildProjectSlices, buildSessionViews } from './Periods';
@@ -46,40 +45,4 @@ export function buildProjectTrend(source: StatsSource, range: RangeDescriptor): 
     value: day.ms,
   }));
   return { points, granularity: 'day', max: Math.max(0, ...points.map((point) => point.value)) };
-}
-
-/** One line summary of a project slice for lists and tooltips. */
-export function describeProjectSlice(
-  source: StatsSource,
-  slice: { id: string; name: string; ms: number; sessions: number; share: number; lastActive: number }
-): string {
-  const parts = [
-    formatDuration(slice.ms),
-    `${formatPercent(slice.share, 0, source.locale)} of the range`,
-    `${slice.sessions} session${slice.sessions === 1 ? '' : 's'}`,
-  ];
-  if (slice.lastActive > 0) {
-    parts.push(`last active ${formatTimestamp(slice.lastActive, source.locale)}`);
-  }
-  return parts.join(' · ');
-}
-
-/** Number of projects that have any recorded activity. */
-export function trackedProjectCount(source: StatsSource): number {
-  return Object.keys(source.data.projects).length;
-}
-
-/** The project with the most recorded time in the whole history. */
-export function mostActiveProject(source: StatsSource): { id: string; name: string; ms: number } | undefined {
-  const totals: Record<string, number> = {};
-  for (const day of Object.values(source.data.days)) {
-    for (const [id, ms] of Object.entries(day.projects)) {
-      totals[id] = (totals[id] ?? 0) + ms;
-    }
-  }
-  const top = Object.entries(totals).sort((a, b) => b[1] - a[1])[0];
-  if (!top) {
-    return undefined;
-  }
-  return { id: top[0], name: projectMeta(source, top[0])?.name ?? 'Unknown project', ms: top[1] };
 }

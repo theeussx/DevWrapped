@@ -22,12 +22,7 @@ export type MonthKey = string;
 export type LanguageTotals = Record<string, Milliseconds>;
 
 /** Active time per anonymized project id. */
-export type ProjectTotals = Record<string, Milliseconds>;
-
-/** Why tracking is currently not recording activity. */
-export type PauseReason = 'user' | 'idle' | 'disabled';
-
-/**
+export type ProjectTotals = Record<string, Milliseconds>;/**
  * A single stretch of focused coding.
  *
  * `duration` is *active* time: idle stretches are removed when the session is
@@ -130,9 +125,4 @@ export function createDayStats(date: DateKey): DayStats {
     longestSession: 0,
     hourly: new Array<number>(24).fill(0),
   };
-}
-
-/** `true` when a day record carries no activity at all. */
-export function isEmptyDay(day: DayStats): boolean {
-  return day.activeTime <= 0 && day.sessions <= 0;
 }

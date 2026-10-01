@@ -19,19 +19,13 @@ import {
 } from '../types/statistics';
 import { INACTIVITY_TIMEOUT_OPTIONS, MINIMUM_ACTIVE_TIME_OPTIONS, SESSION_RETENTION_OPTIONS } from '../types/config';
 import { isValidDateKey } from '../utils/time';
-import { sanitizeLanguageId, sanitizeProjectName, sanitizeText } from './Sanitization';
+import { sanitizeProjectName, sanitizeText } from './Sanitization';
 
 /* ------------------------------- primitives ------------------------------- */
 
 export interface ValidationIssue {
   path: string;
   message: string;
-}
-
-export interface ValidationResult<T> {
-  ok: boolean;
-  value?: T;
-  issues: ValidationIssue[];
 }
 
 export interface Schema<T> {
@@ -533,52 +527,6 @@ export function emptyDatabase(now = Date.now(), retentionDays = 365): DatabaseDa
     sessions: [],
     projects: {},
   };
-}
-
-/* --------------------------------- messages ------------------------------- */
-
-/** Validates a stored session record before it is written back. */
-export function sanitizeSession(value: unknown): CodingSession | undefined {
-  const issues: ValidationIssue[] = [];
-  const parsed = sessionSchema.validate(value, '$', issues);
-  if (parsed === undefined) {
-    return undefined;
-  }
-  const language = parsed.language ? sanitizeLanguageId(parsed.language) : undefined;
-  const projectName = parsed.projectName ? sanitizeProjectName(parsed.projectName) : undefined;
-  const session: CodingSession = {
-    id: parsed.id,
-    startTime: parsed.startTime,
-    endTime: parsed.endTime,
-    duration: Math.min(parsed.duration, MAX_MS_PER_DAY),
-  };
-  if (language) {
-    session.language = language;
-  }
-  if (parsed.project) {
-    session.project = parsed.project;
-  }
-  if (projectName) {
-    session.projectName = projectName;
-  }
-  return session;
-}
-
-/** Validates the hourly histogram of a delta (always 24 buckets, clamped). */
-export function sanitizeHourly(value: unknown): number[] {
-  const issues: ValidationIssue[] = [];
-  const parsed = hourlySchema.validate(value, '$.hourly', issues);
-  return parsed ?? new Array<number>(24).fill(0);
-}
-
-/** Validates a counters map (languages or projects). */
-export function sanitizeCounts(
-  value: unknown,
-  options: { maxEntries: number; maxValue: number } = { maxEntries: 500, maxValue: MAX_MS_PER_DAY }
-): Record<string, number> {
-  const issues: ValidationIssue[] = [];
-  const parsed = countMapSchema(options).validate(value, '$.counts', issues);
-  return parsed ?? {};
 }
 
 /** Validates the current activity timeout option. */

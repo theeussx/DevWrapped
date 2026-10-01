@@ -300,12 +300,6 @@ export function projectMeta(source: StatsSource, id: string): ProjectMeta | unde
   return undefined;
 }
 
-/** Number of distinct projects/languages seen in a range. */
-export function distinctCount(totals: RangeTotals, kind: 'languages' | 'projects'): number {
-  const values = kind === 'languages' ? totals.languages : totals.projects;
-  return Object.values(values).filter((ms) => ms > 0).length;
-}
-
 /** Key with the highest value in a `Record<string, number>`. */
 export function topKey(values: Record<string, number>): string | undefined {
   let best: string | undefined;
@@ -330,27 +324,6 @@ export function peakHour(totals: RangeTotals): number | undefined {
     }
   });
   return hour;
-}
-
-/** Hourly buckets of an already aggregated range, ready for the chart. */
-export function hourlyBuckets(totals: RangeTotals): Array<{ hour: number; ms: number }> {
-  return totals.hourly.map((ms, hour) => ({ hour, ms }));
-}
-
-/** Merge two totals-like maps without mutating the inputs. */
-export function mergeMaps(...maps: Array<Record<string, number>>): Record<string, number> {
-  const result: Record<string, number> = {};
-  for (const map of maps) {
-    for (const [key, value] of Object.entries(map)) {
-      result[key] = (result[key] ?? 0) + value;
-    }
-  }
-  return result;
-}
-
-/** Milliseconds of a day that fall into a given hour (used by tests). */
-export function hourBucketOf(day: DayStats, hour: number): number {
-  return day.hourly[hour] ?? 0;
 }
 
 /** Empty day record for a date key (re-exported for convenience). */

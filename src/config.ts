@@ -71,12 +71,6 @@ export function displayLocale(): string {
   return typeof locale === 'string' && locale.length > 0 ? locale : 'en';
 }
 
-/** `true` when the editor reports a light theme (used to pick the icon tone). */
-export function isLightTheme(): boolean {
-  const kind = vscode.window.activeColorTheme?.kind;
-  return kind === vscode.ColorThemeKind.Light || kind === vscode.ColorThemeKind.HighContrastLight;
-}
-
 /** First day of the week, following the locale (0 = Sunday, 1 = Monday). */
 export function weekStartsOn(): number {
   const locale = displayLocale().toLowerCase();

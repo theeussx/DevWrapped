@@ -14,8 +14,6 @@ import { redactForLog } from '../security/Sanitization';
 
 export type LogLevel = 'error' | 'warn' | 'info' | 'debug';
 
-const LEVEL_ORDER: Record<LogLevel, number> = { error: 0, warn: 1, info: 2, debug: 3 };
-
 /** Where log lines end up (usually the VS Code output channel). */
 export interface LogSink {
   appendLine(line: string): void;
@@ -102,12 +100,6 @@ export class Logger {
   }
 }
 
-/** Logger used by pure modules and tests. */
-export const nullLogger = new Logger({
-  sink: { appendLine: () => undefined },
-  debugEnabled: () => false,
-});
-
 /** `JSON.stringify` that survives circular structures and `BigInt`. */
 export function safeJson(value: unknown, maxLength = 400): string {
   try {
@@ -126,9 +118,4 @@ function replaceUnsupported(_key: string, value: unknown): unknown {
     return value.toString();
   }
   return value;
-}
-
-/** `true` when `level` is at least as verbose as `minimum`. */
-export function isLevelEnabled(level: LogLevel, minimum: LogLevel): boolean {
-  return LEVEL_ORDER[level] <= LEVEL_ORDER[minimum];
 }

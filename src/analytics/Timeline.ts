@@ -6,13 +6,13 @@
  * — every number in the dashboard can be traced back to a session here.
  */
 
-import type { ActivityPayload, DailyTotalView, TimelineEventView } from '../types/analytics';
-import { formatDateLong, formatDuration, formatPercent, formatTime, languageLabel } from '../utils/format';
+import type { ActivityPayload, TimelineEventView } from '../types/analytics';
+import { formatDateLong, formatDuration, formatTime, languageLabel } from '../utils/format';
 import { dateKey } from '../utils/time';
 import type { StatsSource } from './Aggregator';
 import { rangeTotals, sessionsInRange } from './Aggregator';
 import { buildDailyTotals, sessionTimeRange } from './Periods';
-import { describeRange, type RangeDescriptor } from './Ranges';
+import type { RangeDescriptor } from './Ranges';
 
 /** Maximum number of timeline entries sent to the webview. */
 export const TIMELINE_LIMIT = 300;
@@ -137,21 +137,6 @@ export function sessionDetail(
     parts.push(name);
   }
   return parts.join(' · ');
-}
-
-/** Share of the range that a day represents (used by the activity list). */
-export function dayShare(day: DailyTotalView, totalMs: number, locale: string): string {
-  return formatPercent(totalMs > 0 ? day.ms / totalMs : 0, 0, locale);
-}
-
-/** `Sep 22` label for a day row. */
-export function dayLabelFor(source: StatsSource, day: DailyTotalView): string {
-  return formatDateLong(new Date(`${day.date}T12:00:00`).getTime(), source.locale);
-}
-
-/** Description of a range for the activity page header. */
-export function activityRangeLabel(source: StatsSource, range: RangeDescriptor): string {
-  return describeRange(range, source.locale);
 }
 
 /** Key with the largest value. */

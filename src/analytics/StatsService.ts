@@ -38,8 +38,8 @@ import { buildWeeklyStats } from './WeeklyStats';
 import { buildWrapped } from './Wrapped';
 import { buildYearlyStats } from './YearlyStats';
 import { computeStreaks } from './Streaks';
-import { availableYears, monthRange, pageRange, yearRange, type RangeContext } from './Ranges';
-import type { RangeTotals, StatsSource } from './Aggregator';
+import { availableYears, monthRange, yearRange, type RangeContext } from './Ranges';
+import type { StatsSource } from './Aggregator';
 import { rangeTotals } from './Aggregator';
 
 /** Storage facts shown on the Privacy page. */
@@ -202,43 +202,6 @@ export function buildSettingsView(settings: WrappedSettings): SettingsView {
     showStatusBar: settings.showStatusBar,
     sessionRetentionDays: settings.sessionRetentionDays,
   };
-}
-
-/** Today's totals, used by the "Show Today" command and the status bar. */
-export function todayTotals(source: StatsSource): RangeTotals {
-  const context: RangeContext = {
-    now: source.now,
-    locale: source.locale,
-    weekStartsOn: source.weekStartsOn,
-  };
-  const { current } = pageRange(context, 'today', source.data);
-  return rangeTotals(source, current);
-}
-
-/** Day key of the day with the most recent activity (used by notifications). */
-export function latestActiveDay(source: StatsSource): string | undefined {
-  const keys = Object.keys(source.data.days).sort();
-  for (let index = keys.length - 1; index >= 0; index -= 1) {
-    const key = keys[index];
-    if (key && (source.data.days[key]?.activeTime ?? 0) > 0) {
-      return key;
-    }
-  }
-  if (source.live && source.live.ms > 0) {
-    return source.live.date;
-  }
-  return undefined;
-}
-
-/** `true` when the given year has recorded activity. */
-export function hasYearData(source: StatsSource, year: number): boolean {
-  const prefix = String(year);
-  for (const key of Object.keys(source.data.days)) {
-    if (key.startsWith(prefix) && (source.data.days[key]?.activeTime ?? 0) > 0) {
-      return true;
-    }
-  }
-  return source.live !== undefined && source.live.date.startsWith(prefix) && source.live.ms > 0;
 }
 
 /** Day key of "today" in the local timezone (used by commands). */

@@ -7,11 +7,9 @@
  */
 
 import type { LanguagesPagePayload, TrendPoint, TrendView } from '../types/analytics';
-import { languageLabel } from '../utils/format';
-import { dateKey } from '../utils/time';
 import type { StatsSource } from './Aggregator';
 import { rangeTotals, sessionsInRange } from './Aggregator';
-import { buildLanguageSlices, buildSessionViews, toSessionView } from './Periods';
+import { buildLanguageSlices, buildSessionViews } from './Periods';
 import { describeRange, type RangeDescriptor } from './Ranges';
 
 /** Builds the Languages page for a range. */
@@ -51,52 +49,4 @@ export function buildLanguageTrend(source: StatsSource, range: RangeDescriptor):
     value: day.ms,
   }));
   return { points, granularity: 'day', max: Math.max(0, ...points.map((point) => point.value)) };
-}
-
-/** Sessions of one language, newest first (used by the languages page). */
-export function sessionsForLanguage(
-  source: StatsSource,
-  range: RangeDescriptor,
-  languageId: string,
-  limit = 50
-): Array<ReturnType<typeof toSessionView>> {
-  return sessionsInRange(source, range)
-    .filter((session) => session.language === languageId)
-    .reverse()
-    .slice(0, limit)
-    .map((session) => toSessionView(session, range));
-}
-
-/** Number of days on which a language was used. */
-export function daysUsed(source: StatsSource, range: RangeDescriptor, languageId: string): number {
-  return rangeTotals(source, range).days.filter((day) => (day.languages[languageId] ?? 0) > 0).length;
-}
-
-/** `First seen <date>` style description for a language. */
-export function firstSeenLabel(source: StatsSource, languageId: string): string | undefined {
-  const keys = Object.keys(source.data.days).sort();
-  for (const key of keys) {
-    const day = source.data.days[key];
-    if (day && (day.languages[languageId] ?? 0) > 0) {
-      return key;
-    }
-  }
-  return undefined;
-}
-
-/** Language of the day with the most activity (used by insights). */
-export function dominantLanguageOfDay(source: StatsSource, key: string): string | undefined {
-  const day = source.data.days[key] ?? (source.live?.date === key ? source.live : undefined);
-  if (!day) {
-    return undefined;
-  }
-  const totals = Object.entries(day.languages).sort((a, b) => b[1] - a[1])[0];
-  return totals ? totals[0] : undefined;
-}
-
-/** Label of the current day, for the "today" hint on the languages page. */
-export function todayLanguageHint(source: StatsSource): string {
-  const key = dateKey(source.now);
-  const language = dominantLanguageOfDay(source, key);
-  return language ? `${languageLabel(language)} was most active today.` : 'No language activity recorded today yet.';
 }

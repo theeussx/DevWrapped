@@ -90,11 +90,6 @@ export function dayOfWeek(ts: number): number {
   return new Date(ts).getDay();
 }
 
-/** Zero based month index for a timestamp. */
-export function monthOfYear(ts: number): number {
-  return new Date(ts).getMonth();
-}
-
 /** Hour of day (0-23) for a timestamp. */
 export function hourOfDay(ts: number): number {
   return new Date(ts).getHours();
@@ -174,24 +169,8 @@ export function weekStartKey(ts: number, weekStartsOn: number = DEFAULT_WEEK_STA
   return dateKey(startOfWeek(ts, weekStartsOn));
 }
 
-/** Shift a date key by a number of days. */
-export function shiftDateKey(key: DateKey, days: number): DateKey {
-  const start = parseDateKey(key);
-  return start === undefined ? key : dateKey(addDays(start, days));
-}
-
 /** Format a timestamp as `HH:MM` in local time (numeric, locale independent). */
 export function clockTime(ts: number): string {
   const date = new Date(ts);
   return `${pad2(date.getHours())}:${pad2(date.getMinutes())}`;
-}
-
-/** Milliseconds since the start of the local day. */
-export function msSinceStartOfDay(ts: number): number {
-  return ts - startOfDay(ts);
-}
-
-/** Clamps a timestamp into the given inclusive range. */
-export function clamp(ts: number, min: number, max: number): number {
-  return Math.min(Math.max(ts, min), max);
 }

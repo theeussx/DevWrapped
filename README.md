@@ -305,7 +305,7 @@ Importing is deliberately careful:
 src/
 ├── extension.ts              activation, wiring, status bar, shutdown
 ├── types/                    shared contracts (statistics, config, dashboard, analytics, delta)
-├── utils/                    time, formatting, events, async, ids, logging
+├── utils/                    time, formatting, ids, logging
 ├── tracking/                 ActivityTracker, SessionManager, IdleDetector, ProjectResolver
 ├── analytics/                daily/weekly/monthly/yearly/language/project statistics, periods,
 │                             streaks, heatmap calendar, insights, wrapped slides, StatsService
@@ -352,7 +352,7 @@ every script is loaded with a per-load nonce.
 |---|---|
 | Type check | `npm run typecheck` |
 | Lint | `npm run lint` |
-| Tests | `npm test` (71 tests across time, validation, analytics, storage, tracking and security) |
+| Tests | `npm test` (89 tests: time, validation, analytics, storage, tracking, security, webview rendering and an end-to-end host run) |
 | Secret scan | `npm run security:scan` |
 | Security checklist | `npm run security:check` |
 | Dependency audit | `npm run audit` |

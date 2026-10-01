@@ -49,8 +49,9 @@ First public release: a local-only, privacy-first coding retrospective for Visua
 - **Project infrastructure**
   - Strict TypeScript configuration (ES2022, `strict`, `noUncheckedIndexedAccess`) and type-aware ESLint
     rules that ban `any`, `eval`, `new Function`, `child_process`, network modules and `fetch`.
-  - A `node:test` suite of 71 tests covering time handling, validation, analytics, storage, tracking and
-    security invariants.
+  - A `node:test` suite of 89 tests covering time handling, validation, analytics, storage, tracking,
+    security invariants, webview rendering and a full run of the activated extension against an
+    in-memory VS Code host.
   - Secret scanning and a security checklist script, dependency audit, CI on Linux/Windows/macOS with two
     Node versions, and a tag-triggered release workflow that publishes only after all checks pass.
   - Activity Bar container, status bar indicator, "Run Extension" launch configuration and VSIX packaging.

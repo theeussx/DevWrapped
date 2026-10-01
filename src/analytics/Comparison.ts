@@ -63,14 +63,3 @@ export function comparisonSummary(view: ComparisonView): string {
   const direction = view.deltaMs > 0 ? 'more' : 'less';
   return `${formatDuration(Math.abs(view.deltaMs))} ${direction} than ${view.previousLabel.toLowerCase()}.`;
 }
-
-/** Neutral tone for a comparison chip: never frames a drop as a failure. */
-export function comparisonTone(view: ComparisonView): 'neutral' | 'muted' | 'positive' {
-  if (!view.available) {
-    return 'muted';
-  }
-  if (view.deltaMs === 0) {
-    return 'neutral';
-  }
-  return 'positive';
-}

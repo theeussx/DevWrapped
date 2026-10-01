@@ -22,7 +22,7 @@ import type {
 } from '../types/analytics';
 import type { CodingSession } from '../types/statistics';
 import { formatDateShort, formatDuration, formatPercent, formatTime, languageLabel, weekdayOrder, formatWeekdayShort } from '../utils/format';
-import { MS_PER_HOUR, clockTime } from '../utils/time';
+import { clockTime } from '../utils/time';
 import type { RangeTotals, StatsSource } from './Aggregator';
 import { liveSession, rangeTotals, sessionsInRange, topLanguages, topProjects } from './Aggregator';
 import { compareTotals, comparisonSummary } from './Comparison';
@@ -356,17 +356,6 @@ export function periodTitle(page: 'today' | 'week' | 'month'): string {
     default:
       return 'This month';
   }
-}
-
-/** Average active time per hour of the day (used by the year page). */
-export function averagePerHour(totals: RangeTotals): number {
-  const activeHours = totals.hourly.filter((ms) => ms > 0).length;
-  return activeHours > 0 ? Math.round(totals.ms / activeHours) : 0;
-}
-
-/** Active hours of a period (a "coding hour" is a full hour bucket). */
-export function activeHourCount(totals: RangeTotals): number {
-  return Math.round(totals.ms / MS_PER_HOUR);
 }
 
 /** Local date key of a timestamp. */

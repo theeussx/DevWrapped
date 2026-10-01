@@ -12,7 +12,7 @@ import { formatDateLong, formatDuration, formatHours, formatPercent, languageLab
 import { hourOfDay } from '../utils/time';
 import type { RangeTotals, StatsSource } from './Aggregator';
 import { projectMeta, rangeTotals } from './Aggregator';
-import { busiestMonth, yearTotals } from './YearlyStats';
+import { busiestMonth } from './YearlyStats';
 import { monthlyTotals } from './MonthlyStats';
 import { buildWeekdayBuckets } from './Periods';
 import { previousRange, yearRange, type RangeContext, type RangeDescriptor } from './Ranges';
@@ -293,14 +293,6 @@ function buildOutroSlide(
     footnote:
       'Every number lives in one local file. Export it, keep it, or reset it — you are in control of your data.',
   };
-}
-
-/** Total hours of a year, used by the status bar notification text. */
-export function wrappedHeadline(source: StatsSource, year: number): string {
-  const totals = yearTotals(source, year);
-  return totals.ms > 0
-    ? `${formatDuration(totals.ms)} of active coding in ${year}`
-    : `No activity recorded in ${year}`;
 }
 
 /** Hour of day of a timestamp (re-export used by tests). */

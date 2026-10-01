@@ -8,15 +8,7 @@
  * can only ever lose the last few seconds of activity.
  */
 
-import {
-  createDayStats,
-  type CodingSession,
-  type DateKey,
-  type DayStats,
-  type LanguageTotals,
-  type ProjectMeta,
-  type ProjectTotals,
-} from './statistics';
+import type { CodingSession, DateKey, LanguageTotals, ProjectMeta, ProjectTotals } from './statistics';
 
 /** The part of the current session that has not been written to disk yet. */
 export interface LiveContribution {
@@ -123,20 +115,6 @@ export function accumulateDayDelta(target: DayDelta, part: Partial<DayDelta>): v
   }
 }
 
-/** Merges one database delta into another (used when several ticks queue up). */
-export function mergeDatabaseDelta(target: DatabaseDelta, part: DatabaseDelta): DatabaseDelta {
-  for (const [date, day] of Object.entries(part.days)) {
-    const existing = target.days[date] ?? emptyLiveContribution(date);
-    accumulateDayDelta(existing, day);
-    target.days[date] = existing;
-  }
-  if (part.sessions.length > 0) {
-    target.sessions.push(...part.sessions);
-  }
-  Object.assign(target.projects, part.projects);
-  return target;
-}
-
 /** Adds a finished session to a delta (counted against the day it ended). */
 export function addSessionToDelta(delta: DatabaseDelta, session: CodingSession, dayKey: DateKey): void {
   const day = delta.days[dayKey] ?? emptyLiveContribution(dayKey);
@@ -153,30 +131,4 @@ export function addSessionToDelta(delta: DatabaseDelta, session: CodingSession, 
       lastSeen: existing ? Math.max(existing.lastSeen, session.endTime) : session.endTime,
     };
   }
-}
-
-/** True when a delta carries a project name for an id that is new. */
-export function projectNamesOf(delta: DayDelta): Record<string, string> {
-  return delta.projectNames;
-}
-
-/** Converts a live contribution into a day record (used by tests and exports). */
-export function liveToDayStats(live: LiveContribution): DayStats {
-  const day = createDayStats(live.date);
-  day.activeTime = live.ms;
-  day.sessions = live.sessions;
-  day.languages = { ...live.languages };
-  day.projects = { ...live.projects };
-  day.filesModified = live.filesModified;
-  day.filesSaved = live.filesSaved;
-  day.filesOpened = live.filesOpened;
-  day.longestSession = live.longestSession;
-  day.hourly = [...live.hourly];
-  if (live.firstActivity !== undefined) {
-    day.firstActivity = live.firstActivity;
-  }
-  if (live.lastActivity !== undefined) {
-    day.lastActivity = live.lastActivity;
-  }
-  return day;
 }

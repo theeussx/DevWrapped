@@ -67,13 +67,6 @@ export interface TrackingStatus {
   projectName?: string;
 }
 
-/** One entry of the activity log shown in the dashboard. */
-export interface ActivityEventView {
-  at: number;
-  kind: string;
-  detail?: string;
-}
-
 /** Values shown in the status bar tooltip and on the Privacy page. */
 export interface StatusPayload {
   tracking: {

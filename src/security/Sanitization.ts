@@ -188,21 +188,3 @@ export function topEntries(totals: Record<string, number>, limit: number): Array
     .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
     .slice(0, Math.max(0, limit));
 }
-
-/** Truncates a list of strings, dropping empty entries. */
-export function compactList(values: unknown[], limit: number): string[] {
-  const result: string[] = [];
-  for (const value of values) {
-    if (typeof value !== 'string') {
-      continue;
-    }
-    const cleaned = sanitizeText(value);
-    if (cleaned.length > 0) {
-      result.push(cleaned);
-    }
-    if (result.length >= limit) {
-      break;
-    }
-  }
-  return result;
-}

@@ -7,8 +7,6 @@
  * that the shipped build still honours it.
  */
 
-import { hashIdentifier, sanitizeProjectName } from './Sanitization';
-
 export interface PrivacyFact {
   /** Short question, for example "Is my source code read?". */
   question: string;
@@ -96,22 +94,3 @@ export const PRIVACY_FACTS: readonly PrivacyFact[] = [
       'No. It counts how many documents you edited or saved; file names are never read or stored.',
   },
 ];
-
-/** One line summary for the README badge block. */
-export const PRIVACY_SUMMARY =
-  'Local only · No source code · No file names · No telemetry · No account · Works offline';
-
-/** Marks a workspace as a project without storing its location. */
-export function pseudonymizeProject(uri: string, salt: string): string {
-  return hashIdentifier(uri, salt);
-}
-
-/** Display name for a project (folder name only, sanitized). */
-export function projectDisplayName(folderName: string): string {
-  return sanitizeProjectName(folderName);
-}
-
-/** Short, human readable description of the pseudonymization scheme. */
-export function describeProjectId(id: string): string {
-  return `salted-hash:${id.slice(0, 8)}…`;
-}

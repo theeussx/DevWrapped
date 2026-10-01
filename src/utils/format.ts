@@ -5,7 +5,7 @@
  * never needs `Intl` options that could disagree with the extension host.
  */
 
-import { MS_PER_HOUR, MS_PER_MINUTE, parseDateKey, startOfWeek } from './time';
+import { MS_PER_HOUR, MS_PER_MINUTE } from './time';
 
 /** Human readable names for the languages VS Code reports. */
 const LANGUAGE_LABELS: Record<string, string> = {
@@ -118,24 +118,6 @@ export function formatDuration(ms: number): string {
   return minutes === 0 ? `${hours}h` : `${hours}h ${minutes < 10 ? '0' : ''}${minutes}m`;
 }
 
-/** `3 hours 20 minutes` — used by the retrospective. */
-export function formatDurationLong(ms: number): string {
-  if (!Number.isFinite(ms) || ms <= 0) {
-    return 'no time';
-  }
-  const totalMinutes = Math.round(ms / MS_PER_MINUTE);
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-  const parts: string[] = [];
-  if (hours > 0) {
-    parts.push(`${hours} ${hours === 1 ? 'hour' : 'hours'}`);
-  }
-  if (minutes > 0 || parts.length === 0) {
-    parts.push(`${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`);
-  }
-  return parts.join(' ');
-}
-
 /** Hours with one decimal (`12.4`). */
 export function formatHours(ms: number): string {
   if (!Number.isFinite(ms) || ms <= 0) {
@@ -143,16 +125,6 @@ export function formatHours(ms: number): string {
   }
   const hours = ms / MS_PER_HOUR;
   return hours >= 100 ? String(Math.round(hours)) : hours.toFixed(hours >= 10 ? 0 : 1);
-}
-
-/** Whole component: the number of complete hours (`12`). */
-export function formatWholeHours(ms: number): number {
-  return Math.floor(Math.max(0, ms) / MS_PER_HOUR);
-}
-
-/** Whole component: the number of minutes (`847`). */
-export function formatWholeMinutes(ms: number): number {
-  return Math.floor(Math.max(0, ms) / MS_PER_MINUTE);
 }
 
 /** Localized integer with thousand separators. */
@@ -182,18 +154,6 @@ export function formatPercent(ratio: number, digits = 0, locale?: string): strin
       }).format(fixed / 100),
     `${fixed.toFixed(digits)}%`
   );
-}
-
-/** `+1h 20m`, `-35m`, `no change`. */
-export function formatDelta(ms: number): string {
-  if (!Number.isFinite(ms)) {
-    return 'no change';
-  }
-  if (ms === 0) {
-    return 'no change';
-  }
-  const sign = ms > 0 ? '+' : '-';
-  return `${sign}${formatDuration(Math.abs(ms))}`;
 }
 
 /** Percentage change between two values, `null` when there is no baseline. */
@@ -278,15 +238,6 @@ export function formatWeekdayShort(weekday: number, locale?: string): string {
   );
 }
 
-/** `Monday`. */
-export function formatWeekdayLong(weekday: number, locale?: string): string {
-  const date = new Date(2026, 0, 4 + weekday, 12, 0, 0, 0);
-  return safeIntl(
-    () => new Intl.DateTimeFormat(localeOr(locale), { weekday: 'long' }).format(date),
-    ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][weekday] ?? ''
-  );
-}
-
 /** `Sep`. */
 export function formatMonthShort(monthIndex: number, locale?: string): string {
   const date = new Date(2026, monthIndex, 1, 12, 0, 0, 0);
@@ -322,10 +273,4 @@ export function weekStartsOnFor(weekStartsOn: number): number {
 export function weekdayOrder(weekStartsOn: number): number[] {
   const start = weekStartsOnFor(weekStartsOn);
   return Array.from({ length: 7 }, (_, index) => (start + index) % 7);
-}
-
-/** Start of the week as a timestamp, from a date key. */
-export function weekStartFromKey(key: string, weekStartsOn: number): number {
-  const ts = parseDateKey(key) ?? Date.now();
-  return startOfWeek(ts, weekStartsOn);
 }

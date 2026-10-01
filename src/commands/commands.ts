@@ -113,8 +113,3 @@ export async function updateTrackingContext(paused: boolean): Promise<void> {
     // The context key is cosmetic: failing to set it must never break tracking.
   }
 }
-
-/** Command ids as a plain array (used by tests and diagnostics). */
-export function commandIds(): string[] {
-  return Object.values(COMMAND_IDS);
-}

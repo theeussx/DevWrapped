@@ -7,7 +7,7 @@
  */
 
 import type { CalendarMonthView, MonthlyTotalView, PeriodPayload } from '../types/analytics';
-import { formatDuration, formatMonthShort, formatMonthYear, formatPercent } from '../utils/format';
+import { formatMonthShort, formatMonthYear } from '../utils/format';
 import { addDays, daysInMonth, startOfMonth } from '../utils/time';
 import type { StatsSource } from './Aggregator';
 import { rangeTotals } from './Aggregator';
@@ -81,26 +81,6 @@ export function monthlyTotals(source: StatsSource, year: number): MonthlyTotalVi
     month.share = total > 0 ? month.ms / total : 0;
   }
   return months;
-}
-
-/** Short description of a month used in lists. */
-export function describeMonth(year: number, month: number, locale: string): string {
-  return formatMonthYear(startOfMonth(new Date(year, month, 1).getTime()), locale);
-}
-
-/** Percentage of a month's time spent on a day, for tooltips. */
-export function monthDayShare(dayMs: number, monthMs: number, locale: string): string {
-  return formatPercent(monthMs > 0 ? dayMs / monthMs : 0, 0, locale);
-}
-
-/** Human readable duration for a month row. */
-export function monthDuration(ms: number): string {
-  return formatDuration(ms);
-}
-
-/** Number of days in a month, respecting leap years. */
-export function monthLength(year: number, month: number): number {
-  return daysInMonth(year, month);
 }
 
 /** Day keys of a month. */

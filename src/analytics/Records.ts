@@ -9,9 +9,8 @@
 import type { RecordView } from '../types/analytics';
 import type { DateKey } from '../types/statistics';
 import { formatDateLong, formatDuration, formatHour, languageLabel } from '../utils/format';
-import { dayOfWeek } from '../utils/time';
 import type { RangeTotals, StatsSource } from './Aggregator';
-import { dayTotals, peakHour, projectMeta, topKey } from './Aggregator';
+import { peakHour, projectMeta, topKey } from './Aggregator';
 import type { RangeDescriptor } from './Ranges';
 
 /** Records computed over a range, ordered by relevance. */
@@ -187,11 +186,6 @@ export function formatWeekday(weekday: number, locale: string): string {
   return new Intl.DateTimeFormat(locale.length > 0 ? locale : 'en', { weekday: 'long' }).format(date);
 }
 
-/** Day totals for a day key (re-exported to avoid an extra import). */
-export function dayTotalsFor(source: StatsSource, key: DateKey): ReturnType<typeof dayTotals> {
-  return dayTotals(source, key);
-}
-
 /** Local date key of a timestamp. */
 function dateKeyOf(ts: number): DateKey {
   const date = new Date(ts);
@@ -203,9 +197,4 @@ function dateKeyOf(ts: number): DateKey {
 /** Local noon timestamp of a day key (avoids DST edge cases). */
 function parseDay(key: DateKey): number {
   return new Date(`${key}T12:00:00`).getTime();
-}
-
-/** Weekday of a day key. */
-export function weekdayOf(key: DateKey): number {
-  return dayOfWeek(parseDay(key));
 }

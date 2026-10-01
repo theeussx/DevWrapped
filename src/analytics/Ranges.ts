@@ -181,35 +181,6 @@ export function previousRange(
   }
 }
 
-/** Range for the page the user is looking at. */
-export function pageRange(
-  context: RangeContext,
-  page: 'today' | 'week' | 'month' | 'year',
-  data: DatabaseData,
-  year?: number
-): { current: RangeDescriptor; previous?: RangeDescriptor } {
-  switch (page) {
-    case 'today': {
-      const current = dayRange(context);
-      return { current, previous: previousRange(context, current, data) };
-    }
-    case 'week': {
-      const current = weekRange(context);
-      return { current, previous: previousRange(context, current, data) };
-    }
-    case 'month': {
-      const current = monthRange(context);
-      return { current, previous: previousRange(context, current, data) };
-    }
-    case 'year':
-    default: {
-      const current = yearRange(context, year ?? new Date(context.now).getFullYear());
-      const previous = previousRange(context, current, data);
-      return previous ? { current, previous } : { current };
-    }
-  }
-}
-
 /** `true` when a timestamp falls inside the range. */
 export function inRange(range: RangeDescriptor, ts: number): boolean {
   return ts >= range.start && ts < range.end;
@@ -232,11 +203,6 @@ export function describeRange(range: RangeDescriptor, locale: string): string {
         ? `${formatDateShort(range.start, locale)} – ${formatDateShort(range.end, locale)}`
         : 'All time';
   }
-}
-
-/** Number of days the range covers (at least one). */
-export function rangeDayCount(range: RangeDescriptor): number {
-  return Math.max(1, range.days.length);
 }
 
 /** The years that have any recorded data, newest first. */

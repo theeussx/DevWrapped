@@ -21,7 +21,6 @@ import {
   PRIVACY_FACTS,
   PRIVACY_NEVER_COLLECTED,
   PRIVACY_SAFETY,
-  PRIVACY_SUMMARY,
 } from '../src/security/Privacy';
 import { MIN_YEAR, MAX_YEAR, describeRejectedMessage, normalizeYear, parseWebviewMessage } from '../src/webview/messages';
 import { DB_SCHEMA_VERSION, createDayStats, type DatabaseData } from '../src/types/statistics';
@@ -172,7 +171,6 @@ test('privacy statements stay complete and free of promises about tracking users
     PRIVACY_NEVER_COLLECTED.join(' '),
     PRIVACY_SAFETY.join(' '),
     NETWORK_STATEMENT,
-    PRIVACY_SUMMARY,
   ]
     .join(' ')
     .toLowerCase();

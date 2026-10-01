@@ -9,7 +9,7 @@
  * transfer service writes them where the user chose.
  */
 
-import type { DatabaseData, DayStats } from '../types/statistics';
+import type { DatabaseData } from '../types/statistics';
 import { DB_SCHEMA_VERSION } from '../types/statistics';
 import { escapeCsvCell } from '../security/Sanitization';
 import { MS_PER_MINUTE } from '../utils/time';
@@ -195,19 +195,7 @@ export function projectsCsv(data: DatabaseData): string {
         .join(',');
     });
   return [header.join(','), ...rows].join(CSV_NEWLINE) + CSV_NEWLINE;
-}
-
-/** Daily totals as a small array (used by tests and the wrapped export). */
-export function dayRows(data: DatabaseData): Array<{ date: string; ms: number; sessions: number }> {
-  return Object.keys(data.days)
-    .sort()
-    .map((key) => {
-      const day: DayStats | undefined = data.days[key];
-      return { date: key, ms: day?.activeTime ?? 0, sessions: day?.sessions ?? 0 };
-    });
-}
-
-/* --------------------------------- helpers -------------------------------- */
+}/* --------------------------------- helpers -------------------------------- */
 
 function minutes(ms: number): number {
   return Math.round((Math.max(0, ms) / MS_PER_MINUTE) * 10) / 10;

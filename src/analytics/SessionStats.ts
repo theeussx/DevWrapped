@@ -64,36 +64,3 @@ export function collectLanguages(views: SessionView[]): Array<{ id: string; labe
     .map((id) => ({ id, label: languageLabel(id) }))
     .sort((a, b) => a.label.localeCompare(b.label));
 }
-
-/** Total active time of a session list. */
-export function totalSessionTime(views: SessionView[]): number {
-  return views.reduce((sum, view) => sum + view.durationMs, 0);
-}
-
-/** Session duration histogram (used by the sessions page summary). */
-export function sessionLengthBuckets(views: SessionView[]): Array<{ label: string; count: number }> {
-  const buckets = [
-    { label: 'under 15 minutes', count: 0 },
-    { label: '15 to 30 minutes', count: 0 },
-    { label: '30 to 60 minutes', count: 0 },
-    { label: '1 to 2 hours', count: 0 },
-    { label: 'over 2 hours', count: 0 },
-  ];
-  for (const view of views) {
-    if (view.live) {
-      continue;
-    }
-    if (view.durationMs < 15 * 60_000) {
-      buckets[0]!.count += 1;
-    } else if (view.durationMs < 30 * 60_000) {
-      buckets[1]!.count += 1;
-    } else if (view.durationMs < 60 * 60_000) {
-      buckets[2]!.count += 1;
-    } else if (view.durationMs < 120 * 60_000) {
-      buckets[3]!.count += 1;
-    } else {
-      buckets[4]!.count += 1;
-    }
-  }
-  return buckets;
-}

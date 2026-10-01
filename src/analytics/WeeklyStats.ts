@@ -7,7 +7,7 @@
  */
 
 import type { PeriodPayload } from '../types/analytics';
-import { addDays, startOfWeek } from '../utils/time';
+import { addDays } from '../utils/time';
 import { formatWeekRange } from '../utils/format';
 import type { StatsSource } from './Aggregator';
 import { buildPeriodPayload } from './Periods';
@@ -35,9 +35,4 @@ export function buildWeeklyStats(source: StatsSource, options: WeeklyStatsOption
   payload.subtitle = formatWeekRange(current.start, addDays(current.end, -1), source.locale);
   payload.rangeLabel = current.label;
   return payload;
-}
-
-/** Start of the week containing a timestamp (helper for tests and commands). */
-export function weekStartOf(ts: number, weekStartsOn: number): number {
-  return startOfWeek(ts, weekStartsOn);
 }
