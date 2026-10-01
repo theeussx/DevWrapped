@@ -29,8 +29,6 @@ export const MEDIA_FILES = {
   scripts: ['charts.js', 'format.js', 'ui.js', 'pages.js', 'dashboard.js'],
 } as const;
 
-const NAVIGATE_FOCUS_COMMAND = 'codeWrapped.sidebar.focus';
-
 export class DashboardController implements vscode.WebviewViewProvider, vscode.Disposable {
   /** Activity Bar view id (must match `package.json`). */
   public static readonly viewType = 'codeWrapped.sidebar';
@@ -84,23 +82,6 @@ export class DashboardController implements vscode.WebviewViewProvider, vscode.D
     panel.iconPath = vscode.Uri.joinPath(this.context.extensionUri, 'media', 'icons', 'wrapped.svg');
     this.attachPanel(panel);
     panel.webview.html = this.buildHtml(panel.webview);
-  }
-
-  /** Reveals the sidebar view when no panel is open. */
-  public async revealSidebar(page: DashboardPage = 'overview'): Promise<void> {
-    if (this.view) {
-      this.view.show?.(true);
-      this.navigate(page);
-      return;
-    }
-    try {
-      await vscode.commands.executeCommand(NAVIGATE_FOCUS_COMMAND);
-    } catch {
-      // The view may not be available in this window layout; the panel is the fallback.
-      this.show(page);
-      return;
-    }
-    this.pendingPage = page;
   }
 
   /** Posts a navigation message to every mounted webview. */

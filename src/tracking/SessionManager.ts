@@ -254,13 +254,6 @@ export class SessionManager {
   }
 
   /** Milliseconds until the current session times out (for the UI). */
-  public get remainingMs(): number {
-    if (!this.session) {
-      return 0;
-    }
-    return Math.max(0, this.options.inactivityTimeoutMs() - this.idleMs);
-  }
-
   public summary(): SessionSummary | undefined {
     const session = this.session;
     if (!session) {

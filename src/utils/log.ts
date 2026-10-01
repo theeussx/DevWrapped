@@ -62,10 +62,6 @@ export class Logger {
   }
 
   /** `true` when debug lines are currently emitted. */
-  public get isDebug(): boolean {
-    return this.safeDebugEnabled();
-  }
-
   /** Writes an already formatted block (used by the diagnostics command). */
   public raw(lines: string[]): void {
     for (const line of lines) {

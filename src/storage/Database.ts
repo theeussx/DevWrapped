@@ -190,10 +190,6 @@ export class Database {
   }
 
   /** Deep copy of the database (used by the exporter and by tests). */
-  public cloneData(): DatabaseData {
-    return structuredClone(this.current);
-  }
-
   /* --------------------------------- writing -------------------------------- */
 
   /**
