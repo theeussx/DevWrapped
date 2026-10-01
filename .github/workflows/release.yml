@@ -1,0 +1,85 @@
+# Release pipeline for Dev Wrapped.
+#
+# Triggered by a version tag (`v1.2.3`). The release only happens when every
+# check passes: nothing is published from a commit that failed lint, tests,
+# type checking, the secret scan or the dependency audit.
+#
+# Required repository secret: VSCE_PAT (a Visual Studio Marketplace personal
+# access token with the "Marketplace > Manage" scope). The workflow is skipped
+# when the secret is not configured, so forks stay green.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish the extension
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: npm
+
+      - name: Install dependencies (from the lockfile, no scripts)
+        run: npm ci --ignore-scripts
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Webview render smoke test
+        run: npm run test:webview
+
+      - name: Secret scan
+        run: npm run security:scan
+
+      - name: Dependency audit
+        run: npm run audit
+
+      - name: Build the VSIX
+        run: mkdir -p dist && npx --yes @vscode/vsce@3 package --no-dependencies --out dist/dev-wrapped.vsix
+
+      - name: Security checklist
+        run: npm run security:check
+
+      - name: Check the Marketplace token
+        id: token
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          if [ -n "$VSCE_PAT" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "VSCE_PAT is not configured; skipping the Marketplace publish step." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Publish to the Visual Studio Marketplace
+        if: steps.token.outputs.available == 'true'
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: npx --yes @vscode/vsce@3 publish --no-dependencies --packagePath dist/dev-wrapped.vsix
+
+      - name: Create the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/dev-wrapped.vsix
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

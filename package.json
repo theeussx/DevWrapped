@@ -1,0 +1,290 @@
+{
+  "name": "dev-wrapped",
+  "displayName": "Dev Wrapped",
+  "description": "A Spotify Wrapped-style development retrospective for Visual Studio Code. 100% local, privacy-first activity insights.",
+  "version": "1.0.0",
+  "publisher": "theeussx",
+  "license": "MIT",
+  "author": {
+    "name": "Dev Wrapped contributors"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theeussx/DevWrapped.git"
+  },
+  "bugs": {
+    "url": "https://github.com/theeussx/DevWrapped/issues"
+  },
+  "homepage": "https://github.com/theeussx/DevWrapped#readme",
+  "engines": {
+    "vscode": "^1.90.0",
+    "node": ">=20"
+  },
+  "categories": [
+    "Other",
+    "Visualization"
+  ],
+  "keywords": [
+    "wrapped",
+    "code wrapped",
+    "dev wrapped",
+    "activity",
+    "statistics",
+    "analytics",
+    "privacy",
+    "local-first",
+    "retrospective",
+    "sessions"
+  ],
+  "galleryBanner": {
+    "color": "#0b0e14",
+    "theme": "dark"
+  },
+  "icon": "media/icon.png",
+  "main": "./out/src/extension.js",
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true,
+      "description": "Dev Wrapped never reads file contents, never runs commands and stores all statistics locally, so it is safe in untrusted workspaces."
+    },
+    "virtualWorkspaces": {
+      "supported": true,
+      "description": "Only editor metadata (timestamps, language ids, workspace names) is used."
+    }
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeWrapped.openDashboard",
+        "title": "Open Dashboard",
+        "category": "Code Wrapped",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "codeWrapped.showToday",
+        "title": "Show Today",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.showWeek",
+        "title": "Show This Week",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.showMonth",
+        "title": "Show This Month",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.showYear",
+        "title": "Show This Year",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.showWrapped",
+        "title": "Show Wrapped",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.pauseTracking",
+        "title": "Pause Tracking",
+        "category": "Code Wrapped",
+        "icon": "$(debug-pause)"
+      },
+      {
+        "command": "codeWrapped.resumeTracking",
+        "title": "Resume Tracking",
+        "category": "Code Wrapped",
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "codeWrapped.exportData",
+        "title": "Export Data",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.exportWrapped",
+        "title": "Export Wrapped Retrospective",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.importData",
+        "title": "Import Data",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.resetStatistics",
+        "title": "Reset Statistics",
+        "category": "Code Wrapped"
+      },
+      {
+        "command": "codeWrapped.openPrivacy",
+        "title": "Open Privacy Details",
+        "category": "Code Wrapped",
+        "icon": "$(shield)"
+      },
+      {
+        "command": "codeWrapped.openSettings",
+        "title": "Open Settings",
+        "category": "Code Wrapped",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "codeWrapped.refresh",
+        "title": "Refresh",
+        "category": "Code Wrapped",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "codeWrapped.showLogs",
+        "title": "Show Diagnostics Log",
+        "category": "Code Wrapped"
+      }
+    ],
+    "configuration": {
+      "title": "Code Wrapped",
+      "properties": {
+        "codeWrapped.inactivityTimeout": {
+          "type": "number",
+          "enum": [
+            5,
+            10,
+            15,
+            30
+          ],
+          "enumDescriptions": [
+            "5 minutes of inactivity ends the current session",
+            "10 minutes of inactivity ends the current session (recommended)",
+            "15 minutes of inactivity ends the current session",
+            "30 minutes of inactivity ends the current session"
+          ],
+          "default": 10,
+          "markdownDescription": "Minutes without activity before the current session is closed. Time while you are away is never counted."
+        },
+        "codeWrapped.minimumActiveTime": {
+          "type": "number",
+          "enum": [
+            10,
+            30,
+            60
+          ],
+          "enumDescriptions": [
+            "A day counts as active with 10 minutes of activity",
+            "A day counts as active with 30 minutes of activity",
+            "A day counts as active with 1 hour of activity"
+          ],
+          "default": 10,
+          "markdownDescription": "Minutes of activity required for a day to count as *active* (used by streaks and active-day counts)."
+        },
+        "codeWrapped.trackLanguages": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Record the language id reported by VS Code for the files you edit. No file names or contents are stored."
+        },
+        "codeWrapped.trackProjects": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Record an anonymized project identifier derived from the workspace folder, plus its display name. Full paths are never stored."
+        },
+        "codeWrapped.enableNotifications": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Show occasional notifications (for example when a new yearly retrospective is available)."
+        },
+        "codeWrapped.debugLogging": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Write verbose diagnostics to the *Code Wrapped* output channel. Never contains source code."
+        },
+        "codeWrapped.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Show today's activity in the status bar. Clicking it opens the dashboard."
+        },
+        "codeWrapped.sessionRetentionDays": {
+          "type": "number",
+          "default": 1095,
+          "minimum": 30,
+          "maximum": 3650,
+          "markdownDescription": "How many days of individual session details are kept. Daily aggregates are always kept, so long term charts never lose data."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codeWrapped",
+          "title": "Code Wrapped",
+          "icon": "media/icons/wrapped.svg"
+        }
+      ]
+    },
+    "views": {
+      "codeWrapped": [
+        {
+          "type": "webview",
+          "id": "codeWrapped.sidebar",
+          "name": "Code Wrapped",
+          "icon": "media/icons/wrapped.svg"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "codeWrapped.openDashboard",
+          "when": "view == codeWrapped.sidebar",
+          "group": "navigation@1"
+        },
+        {
+          "command": "codeWrapped.refresh",
+          "when": "view == codeWrapped.sidebar",
+          "group": "navigation@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codeWrapped.resumeTracking",
+          "when": "codeWrapped.trackingPaused"
+        },
+        {
+          "command": "codeWrapped.pauseTracking",
+          "when": "!codeWrapped.trackingPaused"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "build:prod": "tsc -p tsconfig.json --sourceMap false",
+    "watch": "tsc -w -p tsconfig.json",
+    "clean": "node -e \"require('node:fs').rmSync('out',{recursive:true,force:true});require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "npm run build && node --test \"out/test/*.test.js\"",
+    "test:only": "node --test \"out/test/*.test.js\"",
+    "test:webview": "node scripts/webview-smoke.mjs",
+    "security:scan": "node scripts/secret-scan.mjs",
+    "security:check": "node scripts/security-checks.mjs",
+    "security:icon": "node scripts/generate-icon.mjs",
+    "audit": "npm audit --audit-level=high",
+    "verify": "npm run typecheck && npm run lint && npm run test:only && npm run test:webview && npm run security:scan && npm run security:check && npm run audit",
+    "package": "node -e \"require('node:fs').mkdirSync('dist',{recursive:true})\" && npm run build:prod && npx --yes @vscode/vsce@3 package --no-dependencies --out dist/dev-wrapped-$npm_package_version.vsix",
+    "vscode:prepublish": "npm run build:prod"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@types/node": "22.20.4",
+    "@types/vscode": "1.90.0",
+    "eslint": "9.39.5",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.0"
+  }
+}

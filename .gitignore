@@ -1,0 +1,22 @@
+# Build output
+out/
+dist/
+*.vsix
+
+# Dependencies
+node_modules/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+*.log
+.vscode-test/
+coverage/
+
+# Local environment files (never commit secrets or machine settings)
+.env
+.env.*
+!.env.example
+
+# VS Code user settings for this repo are intentionally not ignored
+# (.vscode/launch.json and tasks.json are needed for "Run Extension").
