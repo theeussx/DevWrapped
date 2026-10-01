@@ -35,6 +35,16 @@ export const MAX_YEAR = 2100;
  * whether to log it (debug level only, never the payload).
  */
 export function parseWebviewMessage(raw: unknown): WebviewMessage | undefined {
+  try {
+    return parseUnsafe(raw);
+  } catch {
+    // A hostile message can throw from a getter (`{ get type() { … } }`); that
+    // is just another invalid message, never a failure of the host.
+    return undefined;
+  }
+}
+
+function parseUnsafe(raw: unknown): WebviewMessage | undefined {
   if (raw === null || typeof raw !== 'object' || Array.isArray(raw)) {
     return undefined;
   }
@@ -91,9 +101,13 @@ export function normalizeYear(value: unknown): number | undefined {
 
 /** Short, safe description of a rejected message (no payload contents). */
 export function describeRejectedMessage(raw: unknown): string {
-  if (raw === null || typeof raw !== 'object') {
-    return `non-object message (${typeof raw})`;
+  try {
+    if (raw === null || typeof raw !== 'object') {
+      return `non-object message (${typeof raw})`;
+    }
+    const type = (raw as Record<string, unknown>).type;
+    return `unsupported message type: ${typeof type === 'string' ? sanitizeText(type, 40) : 'missing'}`;
+  } catch {
+    return 'unreadable message';
   }
-  const type = (raw as Record<string, unknown>).type;
-  return `unsupported message type: ${typeof type === 'string' ? sanitizeText(type, 40) : 'missing'}`;
 }

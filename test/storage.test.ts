@@ -258,3 +258,19 @@ test('import refuses forbidden keys, broken JSON and empty backups', () => {
   assert.equal(valid.stats.activeTimeMs, MS_PER_HOUR);
   assert.equal(valid.data?.days['2026-10-01']?.activeTime, MS_PER_HOUR);
 });
+
+test('a delta recorded during a write is never lost', async () => {
+  const directory = await tempDir();
+  const database = await Database.open({ directory });
+
+  database.applyDelta(deltaFor('2026-10-01', MS_PER_HOUR));
+  const write = database.flush();
+  // The tracker keeps counting while the file is being written.
+  database.applyDelta(deltaFor('2026-10-01', MS_PER_HOUR));
+  await write;
+
+  assert.equal(database.isDirty, true, 'changes made during the write must stay pending');
+  await database.flush();
+  const stored = JSON.parse(await fs.readFile(database.filePath, 'utf8')) as DatabaseData;
+  assert.equal(stored.days['2026-10-01']?.activeTime, 2 * MS_PER_HOUR, 'both deltas must reach the disk');
+});

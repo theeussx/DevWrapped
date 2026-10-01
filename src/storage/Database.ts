@@ -51,6 +51,14 @@ export class Database {
   private current: DatabaseData;
   private outcome: LoadOutcome;
   private dirty = false;
+  /**
+   * Bumped by every mutation.
+   *
+   * `flush()` writes asynchronously, and a delta can arrive while the write is
+   * in flight. Comparing the revision before and after the write makes sure
+   * those newer changes stay dirty instead of being silently dropped.
+   */
+  private revision = 0;
   private bytes = 0;
 
   private constructor(options: DatabaseOptions, data: DatabaseData, outcome: LoadOutcome) {
@@ -161,6 +169,7 @@ export class Database {
     }
     this.current.meta.retentionDays = Math.round(days);
     this.prune();
+    this.revision += 1;
     this.dirty = true;
   }
 
@@ -225,6 +234,7 @@ export class Database {
     }
 
     this.current.meta.updatedAt = this.now();
+    this.revision += 1;
     this.dirty = true;
   }
 
@@ -238,6 +248,7 @@ export class Database {
         updatedAt: this.now(),
       },
     };
+    this.revision += 1;
     this.dirty = true;
   }
 
@@ -254,6 +265,7 @@ export class Database {
       sessions: [],
       projects: {},
     };
+    this.revision += 1;
     this.dirty = true;
   }
 
@@ -263,6 +275,7 @@ export class Database {
       return;
     }
     this.prune();
+    const revision = this.revision;
     const payload = JSON.stringify(this.current);
     if (Buffer.byteLength(payload, 'utf8') > this.maxBytes) {
       // Keep dropping the oldest sessions until the file fits.
@@ -271,7 +284,11 @@ export class Database {
     const finalPayload = JSON.stringify(this.current);
     await writeAtomic(this.filePath, finalPayload);
     this.bytes = Buffer.byteLength(finalPayload, 'utf8');
-    this.dirty = false;
+    // Changes recorded while the file was being written keep the database
+    // dirty, so the next flush persists them instead of losing them.
+    if (this.revision === revision) {
+      this.dirty = false;
+    }
   }
 
   /** Writes a copy of the current file with a readable label in its name. */
@@ -308,6 +325,7 @@ export class Database {
     const removed = before - this.current.sessions.length;
     if (removed > 0) {
       this.logger?.debug(`Pruned ${removed} session(s) older than ${Math.round(days)} days.`);
+      this.revision += 1;
       this.dirty = true;
     }
     return removed;
@@ -328,7 +346,9 @@ async function readText(file: string): Promise<string | undefined> {
 /** Moves an unreadable file aside instead of deleting it. */
 async function quarantine(file: string, now: number): Promise<string | undefined> {
   const stamp = new Date(now).toISOString().replace(/[:.]/g, '-');
-  const target = `${file}.corrupt-${stamp}`;
+  // `devwrapped-data.json` becomes `devwrapped-data.corrupt-<stamp>.json`, so
+  // the file keeps a readable extension and sits next to the database.
+  const target = `${file.replace(/\.json$/, '')}.corrupt-${stamp}.json`;
   try {
     await fs.rename(file, target);
     return target;
