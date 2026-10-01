@@ -1,0 +1,25 @@
+# Everything that is not required at runtime is excluded from the VSIX.
+# Dev Wrapped ships compiled JavaScript, the webview assets and its docs only.
+
+.vscode/**
+.github/**
+.vscode-test/**
+docs/**
+scripts/**
+src/**
+test/**
+out/test/**
+dist/**
+node_modules/**
+
+# Sources & build metadata
+**/*.ts
+**/*.map
+tsconfig.json
+eslint.config.mjs
+.npmrc
+.gitignore
+.vscodeignore
+
+# Keep these: README.md, CHANGELOG.md, LICENSE, PRIVACY.md, SECURITY.md,
+# media/** (webview assets + icons), out/src/**
